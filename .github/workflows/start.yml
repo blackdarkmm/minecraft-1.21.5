@@ -57,21 +57,21 @@ jobs:
           mkdir -p ~/.config/rclone
           echo "${{ secrets.RCLONE_CONFIG_BASE64 }}" | base64 -d > ~/.config/rclone/rclone.conf
 
-      #- name: 終極空間優化：tar.zst 串流解壓 (支援多分卷)
-        #run: |
-          #rclone copy gdrive3:1.21.5sWorld1/world.tar.zst.00 ./ --progress
-          #rclone copy gdrive4:1.21.5World2/world.tar.zst.01 ./ --progress
+      - name: 終極空間優化：tar.zst 串流解壓 (支援多分卷)
+        run: |
+          rclone copy gdrive3:1.21.5sWorld1/world.tar.zst.00 ./ --progress
+          rclone copy gdrive4:1.21.5World2/world.tar.zst.01 ./ --progress
 
-          #cat world.tar.zst.* | unzstd | tar -xf -
-          #echo "3. 檢查結果..."
-          #if [ -d "world" ]; then
-            #echo "成功！world 資料夾已就緒。"
-            #du -sh world/
-          #else
-            #echo "錯誤：解壓失敗，請檢查雲端檔名是否為 world.tar.zst.00"
-            #exit 1
-          #fi
-          #rm world.tar.zst.*
+          cat world.tar.zst.* | unzstd | tar -xf -
+          echo "3. 檢查結果..."
+          if [ -d "world" ]; then
+            echo "成功！world 資料夾已就緒。"
+            du -sh world/
+          else
+            echo "錯誤：解壓失敗，請檢查雲端檔名是否為 world.tar.zst.00"
+            exit 1
+          fi
+          rm world.tar.zst.*
 
       - name: 安裝 ZeroTier CLI
         run: |
@@ -89,6 +89,28 @@ jobs:
 
           chmod +x install.sh
           sudo ./install.sh
+
+      - name: 匯入 ZeroTier 身份檔案（保證固定 IP）
+        run: |
+          sudo systemctl stop zerotier-one
+
+          echo "${{ secrets.ZT_IDENTITY_SECRET }}" | sudo tee /var/lib/zerotier-one/identity.secret > /dev/null
+          sudo chmod 600 /var/lib/zerotier-one/identity.secret
+
+          sudo systemctl start zerotier-one
+
+          echo "等待 identity.public 生成..."
+          for i in {1..10}; do
+            if [ -f /var/lib/zerotier-one/identity.public ]; then
+              echo "✅ identity.public 已生成"
+              break
+            fi
+            echo "⏳ identity.public 尚未出現，等待 1 秒..."
+            sleep 1
+          done
+
+          echo "目前身份："
+          sudo cat /var/lib/zerotier-one/identity.public || echo "⚠️ 無法讀取身份"
 
       - name: 加入 ZeroTier 網路
         env:
