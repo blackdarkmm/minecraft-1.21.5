@@ -262,8 +262,8 @@ jobs:
           rclone delete gdrive3:1.21.5World1/ --include "world.tar.zst.*" --drive-use-trash=false
           rclone delete gdrive4:1.21.5World2/ --include "world.tar.zst.*" --drive-use-trash=false
 
-          rclone copy world.tar.zst.00 gdrive3:ATMonsWorld1/ --progress
-          rclone copy world.tar.zst.01 gdrive4:ATMonsWorld2/ --progress
+          rclone copy world.tar.zst.00 gdrive3:1.21.5World1/ --progress
+          rclone copy world.tar.zst.01 gdrive4:1.21.5World2/ --progress
 
       # 最後一個 step 觸發自己重新執行
       - name: 觸發下一次執行
