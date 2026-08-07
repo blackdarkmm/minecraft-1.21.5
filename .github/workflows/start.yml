@@ -57,21 +57,21 @@ jobs:
           mkdir -p ~/.config/rclone
           echo "${{ secrets.RCLONE_CONFIG_BASE64 }}" | base64 -d > ~/.config/rclone/rclone.conf
 
-      - name: 終極空間優化：tar.zst 串流解壓 (支援多分卷)
-        run: |
-          rclone copy gdrive3:1.21.5World1/world.tar.zst.00 ./ --progress
-          rclone copy gdrive4:1.21.5World2/world.tar.zst.01 ./ --progress
+      #- name: 終極空間優化：tar.zst 串流解壓 (支援多分卷)
+        #run: |
+          #rclone copy gdrive3:1.21.5World1/world.tar.zst.00 ./ --progress
+          #rclone copy gdrive4:1.21.5World2/world.tar.zst.01 ./ --progress
 
-          cat world.tar.zst.* | unzstd | tar -xf -
-          echo "3. 檢查結果..."
-          if [ -d "world" ]; then
-            echo "成功！world 資料夾已就緒。"
-            du -sh world/
-          else
-            echo "錯誤：解壓失敗，請檢查雲端檔名是否為 world.tar.zst.00"
-            exit 1
-          fi
-          rm world.tar.zst.*
+          #cat world.tar.zst.* | unzstd | tar -xf -
+          #echo "3. 檢查結果..."
+          #if [ -d "world" ]; then
+            #echo "成功！world 資料夾已就緒。"
+            #du -sh world/
+          #else
+            #echo "錯誤：解壓失敗，請檢查雲端檔名是否為 world.tar.zst.00"
+            #exit 1
+          #fi
+          #rm world.tar.zst.*
 
       - name: 安裝 ZeroTier CLI
         run: |
